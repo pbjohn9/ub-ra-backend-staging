@@ -7,12 +7,14 @@
         <div class="card">
             <div class="card-body">
                 <h3 class="text-center m-0">
-                    <a href="{{ url('') }}" class="logo logo-admin"><img src="{{ URL::asset('assets/images/logo.png') }}" height="30" alt="logo"></a>
+                    <a href="{{ url('') }}" class="logo logo-admin">
+                        <img src="{{ URL::asset('assets/images/ultimatebundles_logo.png') }}" class="img-fluid" alt="logo">
+                    </a>
                 </h3>
 
                 <div class="p-3">
                     <h4 class="text-muted font-18 m-b-5 text-center">Welcome Back !</h4>
-                    <p class="text-muted text-center">Sign in to continue to Admiria.</p>
+                    <p class="text-muted text-center">Sign in to continue to {{ config('app.name') }}.</p>
 
                     <form class="form-horizontal m-t-30" method="POST" action="{{ route('login') }}">
                         @csrf

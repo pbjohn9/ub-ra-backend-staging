@@ -5,7 +5,7 @@
 <div class="topbar-left">
     <div class="">
         <!--<a href="index" class="logo text-center">Admiria</a>-->
-        <a href="{{ route('home') }}" class="logo"><img src="{{ URL::asset('assets/images/logo-sm.png') }}" height="36" alt="logo"></a>
+        <a href="{{ route('home') }}" class="logo"><img src="{{ URL::asset('assets/images/ultimatebundles_icon.png') }}" height="36" alt="logo"></a>
     </div>
 </div>
 
