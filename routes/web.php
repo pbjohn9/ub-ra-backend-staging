@@ -25,14 +25,16 @@ Route::get('/', function () {
 Auth::routes();
 
 
-Route::group(['middleware'=>['auth']],function(){
+Route::group(['middleware'=>['auth'],"namespace" => "App\Http\Controllers"],function(){
 
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/home', "DashboardController@dashboard")->name('home');
     Route::get('/profile',[HomeController::class,'viewProfile'])->name('profile');
     Route::patch('/profile',[HomeController::class,'updateProfile'])->name('profile.update');
 
     Route::resource('users',UsersController::class);
     Route::resource('permissions',PermissionsController::class);
     Route::resource('roles',RolesController::class);
+
+    Route::get('/dashboard',"DashboardController@dashboard")->name('dashboard');
 
 });
