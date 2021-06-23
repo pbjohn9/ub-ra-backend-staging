@@ -12,6 +12,12 @@
 <div class="sidebar-inner slimscrollleft">
     <div id="sidebar-menu">
         <ul>
+            <li>
+                <a href="{{ route('dashboard') }}" class="waves-effect {{ request()->is('dashboard') ? "active" : "" }}">
+                    <i class="mdi mdi-home-modern"></i>
+                    <span>{{ __('Dashboard') }}</span>
+                </a>
+            </li>
             @can('user_management_access')
                 <li>
                     <a href="{{ route('users.index') }}" class="waves-effect {{ request()->is('users') || request()->is('users/*') ? 'active' : '' }}">
@@ -38,6 +44,7 @@
                     </a>
                 </li>
             @endcan
+
         </ul>
     </div>
     <div class="clearfix"></div>
