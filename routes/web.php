@@ -36,5 +36,6 @@ Route::group(['middleware'=>['auth'],"namespace" => "App\Http\Controllers"],func
     Route::resource('roles',RolesController::class);
 
     Route::get('/dashboard',"DashboardController@dashboard")->name('dashboard');
+    Route::post('/dashboard',"DashboardController@dashboard")->name('dashboard.post');
 
 });

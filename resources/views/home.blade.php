@@ -2,49 +2,65 @@
     'title'=>'Home'
 ])
 
-@section('content')
+@section('breadcrumb')
+<!-- Page-Title -->
 <div class="row">
     <div class="col-sm-12">
         <div class="page-title-box">
-            <div class="btn-group pull-right">
-                <ul>
-                    <li class="list-inline-item">
-                    <h3 class="page-title">Choose Bundle:</h3>
-                </li>
-                <li class="list-inline-item">
-                    <form method="post" name="myform" action="">
-                        <!-- <select name="bundle" onchange='this.form.submit()'> -->
-                        <select name="bundle" onchange=''>
-                            
-                        </select>
-                </li>
-                <li class="list-inline-item">
-                    <h3 class="page-title">VS Bundle:</h3>
-                </li>
-                <li class="list-inline-item">
-                    <select name="vsbundle" onchange=''>
-                    </select>
-                </li>
-                <li class="list-inline-item">
-                    <input type="submit" value="Submit">
-                    </form>
-                </li>
-            </ul>
-            </div>
             <h4 class="page-title">Dashboard</h4>
         </div>
     </div>
 </div>
 <!-- end page title end breadcrumb -->
+@endsection
 
-
- <!-- Row 1 -->
+@section('content')
+<!-- Row 1 -->
+<div style="height:60px; display: block">
+</div>
+<div class="row">
+ 	<div class="col-xl-12">
+ 		<div class="card m-b-20">
+ 			<div class="card-body">
+ 				<form method="post" name="myform" action="">
+ 					@csrf
+ 					<ul>
+ 						<li class="list-inline-item">
+ 							<h3 class="page-title">Choose Bundle:</h3>
+ 						</li>
+ 						<li class="list-inline-item">
+ 						<!-- <select name="bundle" onchange='this.form.submit()'> -->
+							<select name="bundle" onchange='this.form.submit()'>
+								@foreach($bundles as $bundle)
+								<option value="{{ $bundle->id }}" {{ $input['bundle'] == $bundle->id ? "selected" : "" }}>{{ $bundle->bundle_name."-".fullMonthYearFormat($bundle->start_date) }}</option>
+								@endforeach
+							</select>
+						</li>
+						<li class="list-inline-item">
+							<h3 class="page-title">VS Bundle:</h3>
+						</li>
+						<li class="list-inline-item">
+							<select name="vsbundle" onchange='this.form.submit()'>
+								@foreach($bundles as $bundle)
+								<option value="{{ $bundle->id }}" {{ $input['vsbundle'] == $bundle->id ? "selected" : "" }}>{{ $bundle->bundle_name."-".fullMonthYearFormat($bundle->start_date) }}</option>
+								@endforeach
+							</select>
+						</li>
+						<li class="list-inline-item">
+							<input type="submit" value="Submit">
+						</li>
+					</ul>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
 <div class="row">
     <div class="col-md-6 col-xl-3">
         <div class="mini-stat clearfix bg-white">
             <span class="mini-stat-icon bg-brown mr-0 float-right"><i class="mdi mdi-buffer"></i></span>
             <div class="mini-stat-info">
-                <span class="counter text-brown"></span>
+                <span class="counter text-brown">@money($bundle_total)</span>
                 Bundle Sales
             </div>
             <div class="clearfix"></div> 
