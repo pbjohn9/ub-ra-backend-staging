@@ -64,8 +64,10 @@
                 Bundle Sales
             </div>
             <div class="clearfix"></div> 
-            <p class="text-muted mb-0 m-t-20">
-            	<span class="pull-right"><i class="fa m-r-5"></i>
+            <p class="text-muted mb-0 m-t-20">{{ $lastBundle->bundle_id }}: @money($lb_bundle_total)
+            	<span class="pull-right">
+            		<i class="fa m-r-5"></i>
+            		{{ $bundle_percent }}
             	</span>
         	</p>
         </div>

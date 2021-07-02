@@ -10,13 +10,9 @@ class Order extends Model
 {
     use HasFactory;
 
-    public static function getBundleTotal($input)
+    public static function getBundleTotal($currentBundle)
     {
-    	if(!empty($input['bundle'])) {
-    		$objBundle = Bundle::where('id', $input['bundle'])->first();
-    	} else {
-    		$objBundle = Bundle::orderBy("start_date","desc")->first();
-    	}
+    	$objBundle = $currentBundle;
 
     	$bundle_total = 0;
     	if(!empty($objBundle->id)) {
