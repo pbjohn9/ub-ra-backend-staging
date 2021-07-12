@@ -57,8 +57,37 @@ Class GoogleAnalyticsService
 		$body = new Google_Service_AnalyticsReporting_GetReportsRequest();
 		$body->setReportRequests( array( $request) );
 
-		return $this->service->reports->batchGet( $body );
+		$reports = $this->service->reports->batchGet( $body );
+		return $this->printResults($reports);
 	}
+
+	/**
+     * Parses and prints the Analytics Reporting API V4 response.
+     *
+     * @param An Analytics Reporting API V4 response.
+     */
+    public function printResults($reports) {
+    	for ( $reportIndex = 0; $reportIndex < count( $reports ); $reportIndex++ ) {
+    		$report = $reports[ $reportIndex ];
+    		$header = $report->getColumnHeader();
+    		$dimensionHeaders = $header->getDimensions();
+    		$metricHeaders = $header->getMetricHeader()->getMetricHeaderEntries();
+    		$rows = $report->getData()->getRows();
+
+    		for ( $rowIndex = 0; $rowIndex < count($rows); $rowIndex++) {
+    			$row = $rows[ $rowIndex ];
+    			$dimensions = $row->getDimensions();
+    			$metrics = $row->getMetrics();
+    			for ($j = 0; $j < count($metrics); $j++) {
+    				$values = $metrics[$j]->getValues();
+    				for ($k = 0; $k < count($values); $k++) {
+    					$entry = $metricHeaders[$k];
+    					return $values[$k];
+    				}
+    			}
+    		}
+    	}
+    }
 
 	public function getPercent($tot_bundle_traffic, $last_tot_bundle_traffic)
 	{

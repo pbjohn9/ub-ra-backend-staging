@@ -76,12 +76,14 @@
         <div class="mini-stat clearfix bg-white">
             <span class="mini-stat-icon bg-teal mr-0 float-right"><i class="mdi mdi-coffee"></i></span>
             <div class="mini-stat-info">
-                <span class="counter text-teal"></span>
+                <span class="counter text-teal">{{ $tot_bundle_traffic }}</span>
                 Bundle Traffic
             </div>
             <div class="clearfix"></div>
-            <p class="text-muted mb-0 m-t-20">
-            	<span class="pull-right"><i class="fa m-r-5"></i>
+            <p class="text-muted mb-0 m-t-20"> {{ $lastBundle->bundle_id }}: {{ $last_tot_bundle_traffic }}
+            	<span class="pull-right">
+            		<i class="fa m-r-5"></i>
+            		{{ $bundle_traffic_percent }}
                 </span>
             </p>
         </div>
@@ -90,11 +92,16 @@
         <div class="mini-stat clearfix bg-white">
             <span class="mini-stat-icon bg-purple mr-0 float-right"><i class="mdi mdi-basket"></i></span>
             <div class="mini-stat-info">
-                <span class="counter text-purple"></span>
+                <span class="counter text-purple">@money($mtd_sales)</span>
                 MTD Sales
             </div>
             <div class="clearfix"></div>
-            <p class=" mb-0 m-t-20 text-muted">MTD Goal: $200,000 <span class="pull-right"><i class="fa  m-r-5"></i></span></p>
+            <p class=" mb-0 m-t-20 text-muted">MTD Goal: $200,000 
+            	<span class="pull-right">
+            		<i class="fa  m-r-5"></i>
+            		{{ $mtd_percent }}
+            	</span>
+            </p>
         </div>
 
 
@@ -103,15 +110,14 @@
         <div class="mini-stat clearfix bg-white">
             <span class="mini-stat-icon bg-blue-grey mr-0 float-right"><i class="mdi mdi-black-mesa"></i></span>
             <div class="mini-stat-info">
-                <span class="counter text-blue-grey"></span>
+                <span class="counter text-blue-grey">{{ $mtd_orders }}</span>
                 MTD Orders
             </div>
             <div class="clearfix"></div>
-            <p class="text-muted mb-0 m-t-20">Last Month: 
-                <span class="pull-right">
-                    
-                    
+            <p class="text-muted mb-0 m-t-20">Last Month: {{ $mtd_last_month_order }}
+                <span class="pull-right">                 
                     <i class="fa  m-r-5"></i>
+                    {{ $mtd_order_percent }}
                 </span>
             </p>
         </div>
@@ -127,10 +133,10 @@
         <div class="card m-b-20">
             
             <div class="card-body">
-                    <h4 class="mt-0 header-title">Sales Table: </h4>
-                    <div class="table-responsive table-striped">
+                <h4 class="mt-0 header-title">Sales Table: {{ $currentBundle->bundle_id }}</h4>
+                <div class="table-responsive table-striped">
                     <table class="table mb-0">
-                            <thead class="thead-default">
+                        <thead class="thead-default">
                             <tr>
                                 <th>Day</th>
                                 <th>Sales Page <br> Views</th>
@@ -144,7 +150,9 @@
                                 <th>EPC</th>
                                 <th>Cart $</th>
                             </tr>
-                            </thead>
+                        </thead>
+                            @foreach(getDatesInterval($currentBundle) as $date)
+                            @endforeach
                             <tr>
 	                            <td>Totals:</td>
 	                            <td></td>
@@ -159,11 +167,8 @@
 	                            <td></td>
 	                        </tr>
                     </table>
-                    </div>
-
                 </div>
-
-
+            </div>
         </div>
     </div>
 

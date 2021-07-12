@@ -11,6 +11,7 @@ class DashboardController extends Controller
 {
     public function dashboard(Request $request)
     {
+    	ini_set("memory_limit",-1);
     	// handling inputs
     	$input = $request->all();
     	$input['bundle'] = $input['bundle'] ?? "";
@@ -34,7 +35,19 @@ class DashboardController extends Controller
     	$last_tot_bundle_traffic = $objGService->getPageView($lastBundle);
 
     	// bundle traffic percent
-    	$bundle_traffic_percent = $objGService->getPercent($tot_bundle_traffic, $last_tot_bundle_traffic); 
+    	$bundle_traffic_percent = $objGService->getPercent($tot_bundle_traffic, $last_tot_bundle_traffic);
+
+    	// mtd sales
+    	$mtd_sales = Order::recentTransId();
+    	$mtd_percent = Order::mtdPercent($mtd_sales);
+
+    	// mtd ordres
+    	$mtd_orders = Order::mtdOrders();
+		$mtd_last_month_order = Order::mtdLastMonthOrders();
+		$mtd_order_percent = Order::mtdOrderPercent($mtd_orders, $mtd_last_month_order);
+
+		// Sales Order Table
+		$sales_table = Order::getDateWiseTableDataByBundle($currentBundle);
 
     	return view("home",[
     		"bundles" => $bundles,
@@ -46,6 +59,11 @@ class DashboardController extends Controller
     		"tot_bundle_traffic" => $tot_bundle_traffic,
     		"last_tot_bundle_traffic" => $last_tot_bundle_traffic,
     		"bundle_traffic_percent" => $bundle_traffic_percent,
+    		"mtd_sales" => $mtd_sales,
+    		"mtd_percent" => $mtd_percent,
+    		"mtd_orders"=> $mtd_orders,
+			"mtd_last_month_order"=> $mtd_last_month_order,
+			"mtd_order_percent"=> $mtd_order_percent,
     		"input" => $input,
     	]);
     }
