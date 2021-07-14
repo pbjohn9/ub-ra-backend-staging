@@ -18,10 +18,10 @@ Class GoogleAnalyticsService
 		$this->service = Google::make('AnalyticsReporting');
 	}
 
-	public function getPageView($objBundle)
+	public function getPageView($start_date, $end_date, $objBundle)
 	{	
-		$start_date = $objBundle->start_date;
-		$end_date = $objBundle->end_date;
+		// $start_date = $objBundle->start_date;
+		// $end_date = $objBundle->end_date;
 		$bundle_id = $objBundle->bundle_id;
 
 		// Replace with your view ID, for example XXXX.

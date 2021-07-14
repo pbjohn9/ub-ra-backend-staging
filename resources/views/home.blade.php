@@ -152,6 +152,49 @@
                             </tr>
                         </thead>
                             @foreach(getDatesInterval($currentBundle) as $date)
+                                <tr>
+                                    @php
+                                        $day = $date->format("Y-m-d");
+                                        $pageviews = $sales_table["pageviews"][$day] ?? "";
+                                        $orders = $sales_table["orders"][$day]->order_count ?? 0;
+                                        $total_revenue = $sales_table["daily_total"][$day]->daily_paid ?? 0;
+                                        $cheats = $sales_table["cheats"][$day]->cheat_count ?? 0;
+                                        $cheat_per = (
+                                            !empty($sales_table["orders"][$day]->order_count) && 
+                                            !empty($sales_table["cheats"][$day]->cheat_count)
+                                        ) ? (($sales_table["cheats"][$day]->cheat_count / $sales_table["orders"][$day]->order_count) * 100) : 0;
+                                        $upsells = $sales_table['upsells'][$day]->upsell_count ?? 0;
+                                        $upsell_per = (
+                                            !empty($sales_table["orders"][$day]->order_count) && 
+                                            !empty($sales_table["upsells"][$day]->upsell_count)
+                                        ) ? (($sales_table["upsells"][$day]->upsell_count / $sales_table["orders"][$day]->order_count) * 100) : 0;
+                                        $conversion_p = (
+                                            !empty($sales_table["orders"][$day]->order_count) && 
+                                            !empty($pageviews)
+                                        ) ? round(($sales_table["orders"][$day]->order_count / $pageviews) * 100, 2)."%" : 0;
+                                        $epc = (
+                                            !empty($sales_table["daily_total"][$day]->daily_paid) && 
+                                            !empty($pageviews)
+                                        ) ? ($sales_table["daily_total"][$day]->daily_paid / $pageviews * 100) : 0;
+                                        $cart = (
+                                            !empty($sales_table["daily_total"][$day]->daily_paid) && 
+                                            !empty($sales_table["orders"][$day]->order_count)
+                                        ) ? (($sales_table["daily_total"][$day]->daily_paid / $sales_table["orders"][$day]->order_count) * 100) : 0;
+                                    @endphp
+                                    <td>{{ $day }}</td>
+                                    <td>{{ $pageviews }}</td>
+                                    <td>{{ $orders }}</td>
+                                    <td>@money($total_revenue)</td>
+                                    <td>{{ $cheats }}</td>
+                                    <td>@percentfmt($cheat_per)</td>
+                                    <td>{{ $upsells }}</td>
+                                    <td>@percentfmt($upsell_per)</td>
+                                    <td>{{ $conversion_p }}</td>
+                                    <td>@money($epc)</td>
+                                    <td>@money($epc)</td>
+                                </tr>
+                                @php
+                                @endphp
                             @endforeach
                             <tr>
 	                            <td>Totals:</td>

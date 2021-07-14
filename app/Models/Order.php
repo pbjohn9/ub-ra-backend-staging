@@ -78,7 +78,7 @@ class Order extends Model
     	return number_format($mtd_order_percent,2)."%";
     }
 
-    public static function getDateWiseTableDataByBundle($objBundle)
+    public static function getDateWiseTableDataByBundle($objGService,$objBundle)
     {
 
         $ordersQuery = Order::select([
@@ -136,9 +136,19 @@ class Order extends Model
 
         $upsell_arr = $upsellQuery->keyBy('t_date');
 
-        // printarrq($cheat_arr);
-        
-        // $pageviews= get_pageviews($day,$day,$current_bundle['bundle_id']);
+        $pageviews = [];
+        foreach (getDatesInterval($objBundle) as $date) {
+            $day = $date->format("Y-m-d");
+            $pageviews[$day] = $objGService->getPageView($day,$day,$objBundle);
+        }
+
+        return [
+            "orders" => $orders_arr,
+            "daily_total" => $daily_total_arr,
+            "cheats" => $cheat_arr,
+            "upsells" => $upsell_arr,
+            "pageviews" => $pageviews,
+        ];
 
         
         // $sales_chart_data["Date"] = $day;

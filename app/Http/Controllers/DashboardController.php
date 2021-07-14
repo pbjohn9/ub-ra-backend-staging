@@ -31,11 +31,22 @@ class DashboardController extends Controller
     	$objGService->init();
 
     	// get traffic from google analytics
-    	$tot_bundle_traffic = $objGService->getPageView($currentBundle);
-    	$last_tot_bundle_traffic = $objGService->getPageView($lastBundle);
+    	$tot_bundle_traffic = $objGService->getPageView(
+    		$currentBundle->start_date, 
+    		$currentBundle->end_date,
+    		$currentBundle
+    	);
+    	$last_tot_bundle_traffic = $objGService->getPageView(
+    		$lastBundle->start_date, 
+    		$lastBundle->end_date,
+    		$lastBundle
+    	);
 
     	// bundle traffic percent
-    	$bundle_traffic_percent = $objGService->getPercent($tot_bundle_traffic, $last_tot_bundle_traffic);
+    	$bundle_traffic_percent = $objGService->getPercent(
+    		$tot_bundle_traffic, 
+    		$last_tot_bundle_traffic
+    	);
 
     	// mtd sales
     	$mtd_sales = Order::recentTransId();
@@ -47,7 +58,7 @@ class DashboardController extends Controller
 		$mtd_order_percent = Order::mtdOrderPercent($mtd_orders, $mtd_last_month_order);
 
 		// Sales Order Table
-		$sales_table = Order::getDateWiseTableDataByBundle($currentBundle);
+		$sales_table = Order::getDateWiseTableDataByBundle($objGService,$currentBundle);
 
     	return view("home",[
     		"bundles" => $bundles,
@@ -64,6 +75,7 @@ class DashboardController extends Controller
     		"mtd_orders"=> $mtd_orders,
 			"mtd_last_month_order"=> $mtd_last_month_order,
 			"mtd_order_percent"=> $mtd_order_percent,
+			"sales_table" => $sales_table,
     		"input" => $input,
     	]);
     }
