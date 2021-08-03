@@ -24,8 +24,8 @@ class Order extends Model
     		$bundle_total = Order::whereHas("product",function($q) use ($bundle_id){
     			$q->where('bundle_id', $bundle_id);
     		})
-    		->where('trans_date',">=", $start_date->toDateTimeString())
-    		->where('trans_date',">=", $end_date->toDateTimeString())
+    		->where('trans_date',">=", $start_date->toDateString())
+    		->where('trans_date',"<=", $end_date->toDateString())
     		->sum('paid');
     	}
     	return $bundle_total;
@@ -81,6 +81,9 @@ class Order extends Model
     public static function getDateWiseTableDataByBundle($objGService,$objBundle)
     {
 
+        $start_date = Carbon::parse($objBundle->start_date);
+        $end_date = Carbon::parse($objBundle->end_date);
+
         $ordersQuery = Order::select([
             DB::raw("count(paid) as order_count"),
             DB::raw("sum(paid) as order_paid"),
@@ -89,8 +92,8 @@ class Order extends Model
             $q->where('bundle_id',$objBundle->bundle_id);
             $q->whereNotIn('type',['cheat sheets', 'upsell', 'special offer']);
         })
-        ->where('trans_date',">=", $objBundle->start_date)
-        ->where('trans_date',"<=", $objBundle->end_date)
+        ->where('trans_date',">=", $start_date->toDateString())
+        ->where('trans_date',"<=", $end_date->toDateString())
         ->groupBy(DB::raw("date_format(trans_date,'%Y-%m-%d')"))->get();
 
         $orders_arr = $ordersQuery->keyBy('t_date');
@@ -102,8 +105,8 @@ class Order extends Model
         ])->whereHas("product",function($q) use ($objBundle){
             $q->where('bundle_id',$objBundle->bundle_id);
         })
-        ->where('trans_date',">=", $objBundle->start_date)
-        ->where('trans_date',"<=", $objBundle->end_date)
+        ->where('trans_date',">=", $start_date->toDateString())
+        ->where('trans_date',"<=", $end_date->toDateString())
         ->groupBy(DB::raw("date_format(trans_date,'%Y-%m-%d')"))->get();
 
         $daily_total_arr = $dailyTotalQuery->keyBy('t_date');
@@ -116,8 +119,8 @@ class Order extends Model
             $q->where('bundle_id',$objBundle->bundle_id);
             $q->where('type','Cheat Sheets');
         })
-        ->where('trans_date',">=", $objBundle->start_date)
-        ->where('trans_date',"<=", $objBundle->end_date)
+        ->where('trans_date',">=", $start_date->toDateString())
+        ->where('trans_date',"<=", $end_date->toDateString())
         ->groupBy(DB::raw("date_format(trans_date,'%Y-%m-%d')"))->get();
 
         $cheat_arr = $cheatQuery->keyBy('t_date');
@@ -130,8 +133,8 @@ class Order extends Model
             $q->where('bundle_id',$objBundle->bundle_id);
             $q->where('type','Upsell');
         })
-        ->where('trans_date',">=", $objBundle->start_date)
-        ->where('trans_date',"<=", $objBundle->end_date)
+        ->where('trans_date',">=", $start_date->toDateString())
+        ->where('trans_date',"<=", $end_date->toDateString())
         ->groupBy(DB::raw("date_format(trans_date,'%Y-%m-%d')"))->get();
 
         $upsell_arr = $upsellQuery->keyBy('t_date');
@@ -163,5 +166,81 @@ class Order extends Model
         // $sales_chart_data["EPC"] = !empty($pageviews) ? $formatter->formatCurrency($daily_tot["SUM(paid)"]/$pageviews, 'USD'):0;
         // $sales_chart_data["Cart"] = !empty($daily_tot["Count(paid)"]) ? $formatter->formatCurrency($daily_tot["SUM(paid)"]/$data["Count(paid)"],'USD'):0;
 
+    }
+
+    public static function getRevenueAndTrendTotal($currentBundle, $lastBundle, $lb_bundle_total)
+    {
+        $start_date = Carbon::parse($currentBundle->start_date);
+        $end_date = Carbon::parse($currentBundle->end_date);
+
+        $lb_start_date = Carbon::parse($lastBundle->start_date);
+        $lb_end_date = Carbon::parse($lastBundle->end_date);
+
+        $totals = Order::select([
+            DB::raw("sum(paid) as sum"),
+            DB::raw("date(trans_date) as DATE")
+        ])->whereHas("product",function($q) use ($currentBundle) {
+            $q->where('bundle_id', $currentBundle->bundle_id);
+        })->where('trans_date',">=", $start_date->toDateString())
+        ->where('trans_date',"<=", $end_date->toDateString())
+        ->groupBy(DB::raw("DATE"))->get();
+
+        $lb_totals = Order::select([
+            DB::raw("sum(paid) as sum"),
+            DB::raw("date(trans_date) as DATE")
+        ])->whereHas("product",function($q) use ($lastBundle) {
+            $q->where('bundle_id', $lastBundle->bundle_id);
+        })->where('trans_date',">=", $lb_start_date->toDateString())
+        ->where('trans_date',"<=", $lb_end_date->toDateString())
+        ->groupBy(DB::raw("DATE"))->get();
+
+        $revenue_total = array();
+        $budget_total = array();
+        $goal_total = array();
+        $lb_revenue_total = array();
+        $revenue_trend = array();
+
+        $i=0;
+        $rev=0;
+        foreach ($totals as $total) {
+            $revenue_total[$i] = $total->sum+$rev;
+            $rev = $revenue_total[$i];
+
+            //set the trendline with data we have
+            $revenue_trend[$i] = $revenue_total[$i];
+
+            $i++;
+        }
+
+        $t=0;
+        $revt=0;
+        $revtrend = $rev;
+        foreach ($lb_totals as $lb_total) {
+            $lb_revenue_total[$t]   = $lb_total->sum+$revt;
+            $revt                   = $lb_revenue_total[$t];
+            //get goal totals based on lb totals
+            $bundle_per             = $revt/$lb_bundle_total;
+            $goal_total[$t]         = $currentBundle->goal*$bundle_per;
+            $budget_total[$t]       = $currentBundle->budget*$bundle_per;
+
+            //determine trendline:
+            //yesterdays percent
+            if ($t>=$i) {
+                $last_bundle_per    = $lb_revenue_total[$t-1]/$lb_bundle_total;
+
+                $revenue_trend[$t]  = ($revtrend*$bundle_per)/$last_bundle_per;
+                $revtrend           = $revenue_trend[$t];
+            }
+
+            $t++;
+        }
+
+        return [
+            "revenue_total" => $revenue_total,
+            "budget_total" => $budget_total,
+            "goal_total" => $goal_total,
+            "lb_revenue_total" => $lb_revenue_total,
+            "revenue_trend" => $revenue_trend,
+        ];
     }
 }

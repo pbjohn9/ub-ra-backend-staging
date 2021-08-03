@@ -23,6 +23,7 @@ class DashboardController extends Controller
     	// counts query for bundles
     	$bundle_total = Order::getBundleTotal($currentBundle);
     	$lb_bundle_total = Order::getBundleTotal($lastBundle);
+    	$revenue_and_trend = Order::getRevenueAndTrendTotal($currentBundle, $lastBundle, $lb_bundle_total);
     	// bundle percent
     	$bundle_percent = Bundle::getPercent($bundle_total,$lb_bundle_total);
 
@@ -59,6 +60,7 @@ class DashboardController extends Controller
 
 		// Sales Order Table
 		$sales_table = Order::getDateWiseTableDataByBundle($objGService,$currentBundle);
+		$lb_sales_table = Order::getDateWiseTableDataByBundle($objGService,$lastBundle);
 
     	return view("home",[
     		"bundles" => $bundles,
@@ -76,6 +78,8 @@ class DashboardController extends Controller
 			"mtd_last_month_order"=> $mtd_last_month_order,
 			"mtd_order_percent"=> $mtd_order_percent,
 			"sales_table" => $sales_table,
+			"lb_sales_table" => $lb_sales_table,
+			"revenue_and_trend" => $revenue_and_trend,
     		"input" => $input,
     	]);
     }

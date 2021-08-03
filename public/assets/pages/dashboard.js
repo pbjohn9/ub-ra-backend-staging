@@ -18,7 +18,7 @@
         });
 
         //Knob chart
-        $(".knob").knob();
+        // $(".knob").knob();
 
         //C3 combined chart
         c3.generate({
